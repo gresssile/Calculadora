@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora</title>
+  <link rel="stylesheet" href="calculadora.css">
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #d8d3c6; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="calc" data-calc tabindex="0" role="group" aria-label="Calculadora">
+    <div class="calc-tela" aria-live="polite">
+      <div class="calc-expr"></div>
+      <div class="calc-res">0</div>
+    </div>
+    <div class="calc-teclas">
+      <button type="button" class="calc-limpar" data-k="C" aria-label="Limpar">C</button>
+      <button type="button" class="calc-fn" data-k="()" aria-label="Parênteses">( )</button>
+      <button type="button" class="calc-fn" data-k="%" aria-label="Porcentagem">%</button>
+      <button type="button" class="calc-op" data-k="÷" aria-label="Dividir">÷</button>
+      <button type="button" data-k="7">7</button>
+      <button type="button" data-k="8">8</button>
+      <button type="button" data-k="9">9</button>
+      <button type="button" class="calc-op" data-k="×" aria-label="Multiplicar">×</button>
+      <button type="button" data-k="4">4</button>
+      <button type="button" data-k="5">5</button>
+      <button type="button" data-k="6">6</button>
+      <button type="button" class="calc-op" data-k="−" aria-label="Subtrair">−</button>
+      <button type="button" data-k="1">1</button>
+      <button type="button" data-k="2">2</button>
+      <button type="button" data-k="3">3</button>
+      <button type="button" class="calc-op" data-k="+" aria-label="Somar">+</button>
+      <button type="button" data-k="0">0</button>
+      <button type="button" data-k=",">,</button>
+      <button type="button" class="calc-fn" data-k="⌫" aria-label="Apagar">⌫</button>
+      <button type="button" class="calc-igual" data-k="=" aria-label="Igual">=</button>
+    </div>
+  </div>
+
+  <script src="calculadora.js"></script>
+</body>
+</html>

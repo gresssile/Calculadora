@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora</title>
+  <style>
+.calc {
+  --calc-fundo: #1d1c1a;
+  --calc-borda: #e3b23c;
+  --calc-visor: #ece8dd;
+  --calc-visor-texto: #1d1c1a;
+  --calc-visor-sutil: #6b685f;
+  --calc-tecla: #ece8dd;
+  --calc-texto: #1d1c1a;
+  --calc-op: #e3b23c;
+  --calc-fn: #3a3834;
+  --calc-limpar: #d8582f;
+  box-sizing: border-box;
+  width: min(100%, 410px);
+  padding: 1.4rem;
+  border: 4px solid var(--calc-borda);
+  border-radius: 18px;
+  background: var(--calc-fundo);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.28);
+}
+
+.calc *,
+.calc *::before,
+.calc *::after {
+  box-sizing: border-box;
+}
+
+.calc:focus-visible {
+  outline: 3px solid var(--calc-limpar);
+  outline-offset: 5px;
+}
+
+.calc-tela {
+  min-height: 150px;
+  margin-bottom: 1.2rem;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-align: right;
+  overflow: hidden;
+  background: var(--calc-visor);
+  border: 3px solid #000;
+  border-radius: 10px;
+}
+
+.calc-expr {
+  min-height: 1.6em;
+  color: var(--calc-visor-sutil);
+  font-size: 1.15rem;
+  word-break: break-all;
+}
+
+.calc-res {
+  color: var(--calc-visor-texto);
+  font-size: clamp(2.8rem, 13vw, 4.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calc-teclas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.7rem;
+}
+
+.calc-teclas button {
+  height: 78px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--calc-tecla);
+  color: var(--calc-texto);
+  font: inherit;
+  font-size: 2.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.2s ease;
+}
+
+.calc-teclas button:hover {
+  filter: brightness(1.07);
+}
+
+.calc-teclas button:active,
+.calc-teclas button.calc-press {
+  transform: scale(0.92);
+}
+
+.calc-teclas button:focus-visible {
+  outline: 3px solid var(--calc-limpar);
+  outline-offset: 2px;
+}
+
+.calc-teclas .calc-op {
+  background: var(--calc-op);
+}
+
+.calc-teclas .calc-fn {
+  background: var(--calc-fn);
+  color: var(--calc-tecla);
+  font-size: 1.7rem;
+}
+
+.calc-teclas .calc-limpar {
+  background: var(--calc-limpar);
+  color: #fff;
+}
+
+.calc-teclas .calc-igual {
+  outline: 3px solid var(--calc-op);
+  outline-offset: -3px;
+}
+
+.calc.calc-erro {
+  animation: calc-tremer 0.4s;
+}
+
+@keyframes calc-tremer {
+  20%, 60% { transform: translateX(-7px); }
+  40%, 80% { transform: translateX(7px); }
+}
+
+@media (max-width: 420px) {
+  .calc-teclas button { height: 66px; font-size: 1.8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calc.calc-erro { animation: none; }
+  .calc-teclas button { transition: none; }
+}
+
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #d8d3c6; padding: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="calc" data-calc tabindex="0" role="group" aria-label="Calculadora">
+    <div class="calc-tela" aria-live="polite">
+      <div class="calc-expr"></div>
+      <div class="calc-res">0</div>
+    </div>
+    <div class="calc-teclas">
+      <button type="button" class="calc-limpar" data-k="C" aria-label="Limpar">C</button>
+      <button type="button" class="calc-fn" data-k="()" aria-label="Parênteses">( )</button>
+      <button type="button" class="calc-fn" data-k="%" aria-label="Porcentagem">%</button>
+      <button type="button" class="calc-op" data-k="÷" aria-label="Dividir">÷</button>
+      <button type="button" data-k="7">7</button>
+      <button type="button" data-k="8">8</button>
+      <button type="button" data-k="9">9</button>
+      <button type="button" class="calc-op" data-k="×" aria-label="Multiplicar">×</button>
+      <button type="button" data-k="4">4</button>
+      <button type="button" data-k="5">5</button>
+      <button type="button" data-k="6">6</button>
+      <button type="button" class="calc-op" data-k="−" aria-label="Subtrair">−</button>
+      <button type="button" data-k="1">1</button>
+      <button type="button" data-k="2">2</button>
+      <button type="button" data-k="3">3</button>
+      <button type="button" class="calc-op" data-k="+" aria-label="Somar">+</button>
+      <button type="button" data-k="0">0</button>
+      <button type="button" data-k=",">,</button>
+      <button type="button" class="calc-fn" data-k="⌫" aria-label="Apagar">⌫</button>
+      <button type="button" class="calc-igual" data-k="=" aria-label="Igual">=</button>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  const OPS = "+−×÷";
+  const fmt = n => Number(n).toLocaleString("pt-BR", { maximumFractionDigits: 10 });
+
+  function avaliar(texto) {
+    const bruto = texto.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/,/g, ".");
+    const t = bruto.match(/\d+\.?\d*|\.\d+|[-+*/()%]/g);
+    let i = 0;
+    if (!t || t.join("") !== bruto) throw new Error("sintaxe");
+
+    const expressao = () => {
+      let v = termo();
+      while (t[i] === "+" || t[i] === "-") {
+        const o = t[i++];
+        const r = termo();
+        v = o === "+" ? v + r : v - r;
+      }
+      return v;
+    };
+
+    const termo = () => {
+      let v = fator();
+      while (t[i] === "*" || t[i] === "/") {
+        const o = t[i++];
+        const r = fator();
+        if (o === "/" && r === 0) throw new Error("div0");
+        v = o === "*" ? v * r : v / r;
+      }
+      return v;
+    };
+
+    const fator = () => {
+      if (t[i] === "-") { i++; return -fator(); }
+      if (t[i] === "+") { i++; return fator(); }
+      let v;
+      if (t[i] === "(") {
+        i++;
+        v = expressao();
+        if (t[i] !== ")") throw new Error("sintaxe");
+        i++;
+      } else {
+        if (t[i] === undefined || !/^[\d.]/.test(t[i])) throw new Error("sintaxe");
+        v = parseFloat(t[i++]);
+      }
+      while (t[i] === "%") { i++; v /= 100; }
+      return v;
+    };
+
+    const resultado = expressao();
+    if (i < t.length) throw new Error("sintaxe");
+    return parseFloat(resultado.toPrecision(12));
+  }
+
+  function iniciar(raiz) {
+    if (raiz.dataset.pronta) return;
+    raiz.dataset.pronta = "1";
+    const elExpr = raiz.querySelector(".calc-expr");
+    const elRes = raiz.querySelector(".calc-res");
+    let expr = "";
+    let fim = false;
+    let timer = null;
+
+    const abertos = () => (expr.match(/\(/g) || []).length - (expr.match(/\)/g) || []).length;
+    const ultimo = () => expr.slice(-1);
+    const fechamentos = () => ")".repeat(Math.max(0, abertos()));
+
+    function previa() {
+      if (!expr) return "0";
+      try { return fmt(avaliar(expr + fechamentos())); } catch { return null; }
+    }
+
+    function ajustar() {
+      elRes.style.fontSize = "";
+      let tam = parseFloat(getComputedStyle(elRes).fontSize);
+      while (elRes.scrollWidth > elRes.clientWidth && tam > 20) {
+        tam -= 2;
+        elRes.style.fontSize = tam + "px";
+      }
+    }
+
+    function mostrar() {
+      elExpr.textContent = expr;
+      const p = previa();
+      if (p !== null) {
+        elRes.textContent = p;
+        ajustar();
+      }
+    }
+
+    function erro(msg) {
+      clearTimeout(timer);
+      elRes.textContent = msg;
+      elRes.style.fontSize = "1.4rem";
+      raiz.classList.remove("calc-erro");
+      void raiz.offsetWidth;
+      raiz.classList.add("calc-erro");
+      timer = setTimeout(() => {
+        elRes.style.fontSize = "";
+        raiz.classList.remove("calc-erro");
+        mostrar();
+      }, 1100);
+    }
+
+    function igual() {
+      if (!expr || OPS.includes(ultimo())) return;
+      try {
+        const completo = expr + fechamentos();
+        const v = avaliar(completo);
+        elExpr.textContent = completo + " =";
+        elRes.textContent = fmt(v);
+        ajustar();
+        expr = /e/i.test(String(v)) ? "" : String(v).replace(".", ",");
+        fim = true;
+      } catch (e) {
+        erro(e.message === "div0" ? "Divisão por zero" : "Conta inválida");
+      }
+    }
+
+    function digitar(k) {
+      if (k === "C") { expr = ""; fim = false; return mostrar(); }
+      if (k === "⌫") { expr = expr.slice(0, -1); fim = false; return mostrar(); }
+      if (k === "=") return igual();
+
+      if (fim) {
+        if (/[\d,(]/.test(k) || k === "()") expr = "";
+        fim = false;
+      }
+
+      if (k === "()") k = abertos() > 0 && /[\d)%]/.test(ultimo()) ? ")" : "(";
+      if (k === ")" && !(abertos() > 0 && /[\d)%]/.test(ultimo()))) return;
+
+      if (OPS.includes(k)) {
+        if (!expr || ultimo() === "(") {
+          if (k !== "−") return;
+        } else if (OPS.includes(ultimo())) {
+          expr = expr.slice(0, -1);
+        }
+      }
+
+      if (k === "%" && !/[\d)]/.test(ultimo())) return;
+
+      if (k === ",") {
+        if (expr.split(/[^\d,]/).pop().includes(",")) return;
+        if (!/\d/.test(ultimo())) k = "0,";
+      }
+
+      if ((/\d/.test(k) || k === "(") && /[)%]/.test(ultimo())) expr += "×";
+      if (k === "(" && /\d/.test(ultimo())) expr += "×";
+
+      expr += k;
+      mostrar();
+    }
+
+    function pulsar(k) {
+      const alvo = k === "(" || k === ")" ? "()" : k;
+      const botao = raiz.querySelector('[data-k="' + CSS.escape(alvo) + '"]');
+      if (!botao) return;
+      botao.classList.add("calc-press");
+      setTimeout(() => botao.classList.remove("calc-press"), 110);
+    }
+
+    raiz.addEventListener("click", e => {
+      const botao = e.target.closest("button[data-k]");
+      if (botao) digitar(botao.dataset.k);
+    });
+
+    raiz.addEventListener("keydown", e => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const mapa = { "-": "−", "*": "×", x: "×", X: "×", "/": "÷", ".": ",", Enter: "=", Backspace: "⌫", Escape: "C", Delete: "C", c: "C", C: "C" };
+      const k = mapa[e.key] || e.key;
+      if (!/^[\d+−×÷,()%=⌫C]$/.test(k)) return;
+      e.preventDefault();
+      pulsar(k);
+      digitar(k);
+    });
+
+    mostrar();
+  }
+
+  const iniciarTodas = () => document.querySelectorAll("[data-calc]").forEach(iniciar);
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", iniciarTodas);
+  else iniciarTodas();
+})();
+</script>
+</body>
+</html>
